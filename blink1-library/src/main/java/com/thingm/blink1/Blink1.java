@@ -81,6 +81,17 @@ public abstract class Blink1
   }
 
   /**
+   * Set blink(1) color immediately.
+   *
+   * @param hexCode Color to set in hex
+   * @returns blink1_command response code, -1 == fail
+   */
+  public int setHex(String hexCode) {
+    Color c = convertToRgb(hexCode);
+    return this.setRGB( c.getRed(), c.getGreen(), c.getBlue() );
+  }
+
+  /**
    * Get last color sent (current color
    * @return The current color of the device as int, or <0 on error
    */
@@ -163,6 +174,32 @@ public abstract class Blink1
    * @returns blink1_command response code, -1 == fail 
    */
   public int fadeToRGB(int fadeMillis, Color c, int ledn) {
+    return fadeToRGB( fadeMillis, c.getRed(), c.getGreen(), c.getBlue(), ledn );
+  }
+
+
+  /**
+   * Fade blink(1) to HEX color over fadeMillis milliseconds.
+   *
+   * @param fadeMillis milliseconds to take to get to color
+   * @param hexCode Color to set in hex
+   * @returns blink1_command response code, -1 == fail
+   */
+  public int fadeToHex(int fadeMillis, String hexCode) {
+    Color c = convertToRgb(hexCode);
+    return fadeToRGB( fadeMillis, c.getRed(), c.getGreen(), c.getBlue() );
+  }
+
+  /**
+   * Fade blink(1) to HEX color over fadeMillis milliseconds.
+   *
+   * @param fadeMillis milliseconds to take to get to color
+   * @param hexCode Color to set in hex
+   * @param ledn which LED to address (0=all)
+   * @returns blink1_command response code, -1 == fail
+   */
+  public int fadeToHex(int fadeMillis, String hexCode, int ledn) {
+    Color c = convertToRgb(hexCode);
     return fadeToRGB( fadeMillis, c.getRed(), c.getGreen(), c.getBlue(), ledn );
   }
 
@@ -395,6 +432,35 @@ public abstract class Blink1
   //-------------------------------------------------------------------------
   // Utilty Class methods
   //-------------------------------------------------------------------------
+
+  /**
+   * Convert HTML/hex color code to RGB colors.  Currently only supports 6 digit color codes.
+   */
+
+  public static Color convertToRgb(String hexCode) {
+    if (hexCode == null) {
+      throw new NumberFormatException("Missing hex color code");
+    }
+
+    if(hexCode.startsWith("#")){
+      hexCode = hexCode.replace("#","");
+    }
+
+    if (hexCode.length() != 6) {
+      throw new NumberFormatException("Bad hex color code");
+    }
+
+    int red = Integer.valueOf(hexCode.substring(0, 2), 16);
+    int green = Integer.valueOf(hexCode.substring(2, 4), 16);
+    int blue = Integer.valueOf(hexCode.substring(4, 6), 16);
+
+    if (red < 0 || red > 255 || green < 0 || green > 255 || blue < 0 || blue > 255) {
+      throw new NumberFormatException("Bad hex color code");
+    }
+
+    Color color = new Color(red,green,blue);
+    return color;
+  }
 
   /**
    * one attempt at a degamma curve.

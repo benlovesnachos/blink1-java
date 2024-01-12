@@ -11,6 +11,8 @@ public class OnOffColor {
         if (args.length == 0) {
             outputMessage("Turning off blink1.");
             blink1.off();
+        } else if (args.length == 1) {
+            setHex(blink1, args);
         } else {
             setColor(blink1, args);
         }
@@ -33,6 +35,23 @@ public class OnOffColor {
             exitError(String.format(
                 "One or more of the rgb params is not a number between 0 and 255: r(%s), g(%s), b(%s)",
                 args[0], args[1], args[2]
+            ));
+        }
+    }
+
+    private static void setHex(Blink1 blink1, String[] args) {
+        if (args == null || args.length != 1) {
+            exitError("Pass in a hex color code.  Ex: FF2333, #FF2333");
+        }
+
+        try {
+            String hexCode = args[0];
+            outputMessage(String.format("Setting HEX(%s) on blink1", hexCode));
+            blink1.setHex(hexCode);
+        } catch (NumberFormatException nfe) {
+            exitError(String.format(
+                "The hex value (%s) is invalid. %s",
+                args[0], nfe.getMessage()
             ));
         }
     }
