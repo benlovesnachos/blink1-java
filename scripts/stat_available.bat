@@ -1,5 +1,7 @@
 @echo off
 
+cd /D "%~dp0"
+
 :: Read the config.txt file and set variables
 for /f "tokens=1,2 delims== " %%A in (config.txt) do set %%A=%%B
 
